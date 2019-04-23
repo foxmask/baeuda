@@ -59,10 +59,28 @@ ANKI_TAGS = 'foxmask'   # tags au pif :P
 
 Demarrer Joplin et Anki desktop
 
-Lancer la commande 
+## Lancer la commande 
 
 ```
 python baeuda/anki.py 
 ```
 
 voir les logs sur l'ecran et on contemplate le resultat dans anki desktop
+
+## De Joplin à Anki
+
+1)
+
+![Joplin notes](/joplin_notes.png)
+
+2)
+![Anki integration](/anki_integration.png)
+
+3)
+![Anki Liste des Decks](/anki_list_decks.png)
+
+4)
+![Anki Le Deck](/anki_deck.png)
+
+5)
+![Anki Le Carte](/anki_card.png)
