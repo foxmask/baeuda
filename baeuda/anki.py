@@ -62,11 +62,12 @@ def anki_create_deck(deckName):
     return data    
     
 
-def anki_add_note(deckName, korean, french, romanisation):
+def anki_add_note(deckName, *tags, **fields):
     """
     :param deckName: string deck name
-    :param note: dict of note
-    :return data
+    :param tags: arg of strings
+    :param fields: kwargs
+    :return data kwargs
     """
     data = {
         "action": "addNote",
@@ -75,17 +76,11 @@ def anki_add_note(deckName, korean, french, romanisation):
             "note": {
                 "deckName": deckName,
                 "modelName": settings.ANKI_MODEL,
-                "fields": {
-                    "한국말": korean,
-                    "Français": french,
-                    "Romanisation": romanisation
-                },
+                "fields": fields,
                 "options": {
                     "allowDuplicate": False
                 },
-                "tags": [
-                    settings.ANKI_TAGS,
-                ]
+                "tags": tags
             }
         }        
     }
@@ -97,29 +92,35 @@ def anki(data):
     """
     for line in data:
         soup = BeautifulSoup(line['body'], 'html.parser')
-        deckName = soup.h1.text
-        print("deckName ", deckName)
-        data = anki_create_deck(deckName=deckName)
-        data = json.dumps(data)
-        res = requests.post(url=settings.ANKI_URL, data=data)
-        if res.status_code == 200:
-            i = 0
-            korean = romanisation = french = ''
-            for line in soup.table.tbody.find_all('td'):
-                i = i + 1
-                if i == 4:
-                    i = 1
-                    print("korean ", korean, " romanisation " , romanisation, " french ", french)
-                    data = anki_add_note(deckName, korean, french, romanisation)
-                    data = json.dumps(data)
-                    res = requests.post(url=settings.ANKI_URL, data=data)
-                if i == 1:
-                    korean = line.text.strip()
-                if i == 3:
-                    french = line.text.strip()
-                if i == 2:
-                    romanisation = line.text.strip()
-
+        if hasattr(soup.h1, 'text'):
+            # if ONE_DECK_PER_NOTE is True, will create a deck per not
+            # otherwise will put everything in one deck
+            # but with tags gotten from the title of the note ;)
+            deckName = soup.h1.text if settings.ONE_DECK_PER_NOTE else settings.FOLDER
+            data = anki_create_deck(deckName=deckName)            
+            data = json.dumps(data)
+            tags = line['title'].split(' - ')[1:]
+            res = requests.post(url=settings.ANKI_URL, data=data)
+            if res.status_code == 200:
+                i = 0
+                headers = ()
+                for line in soup.table.thead.find_all('th'):
+                    if line.text in settings.ANKI_FIELDS:
+                        headers += (line.text,)
+                if len(headers) == settings.ANKI_FIELD_COUNT:
+                    lines = ()
+                    i = 0
+                    for line in soup.table.tbody.find_all('td'):
+                        if i == settings.ANKI_FIELD_COUNT:
+                            i = 0
+                            fields = dict(zip(headers, lines))
+                            data = anki_add_note(deckName, *tags, **fields)
+                            data = json.dumps(data, indent=4)
+                            print(data)
+                            res = requests.post(url=settings.ANKI_URL, data=data)
+                            lines = ()                    
+                        i += 1
+                        lines += (line.text, )
 
 if __name__ == '__main__':
     anki(data=data())
