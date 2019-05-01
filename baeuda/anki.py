@@ -7,6 +7,7 @@ import requests
 
 joplin = JoplinApi(settings.TOKEN)
 
+
 def subfolder(folder):
     """
 
@@ -16,6 +17,7 @@ def subfolder(folder):
     for line in folder['children']:
         if settings.FOLDER == line['title']:
             return line['id']
+
 
 def myfolder():
     """
@@ -31,6 +33,7 @@ def myfolder():
             if folder_id is not None:
                 return folder_id
 
+
 def data():
     """
 
@@ -41,30 +44,31 @@ def data():
     notes = joplin.get_folders_notes(folder_id)
     for note in notes.json():
         if settings.FILTER in note['title'] and note['is_todo'] == 0:
-            content = pypandoc.convert_text(source=note['body'], 
-                                            to='html', 
+            content = pypandoc.convert_text(source=note['body'],
+                                            to='html',
                                             format=settings.PYPANDOC_MARKDOWN)
             data.append({'title': note['title'], 'body': content})
     return data
 
-def anki_create_deck(deckName):
+
+def anki_create_deck(deck_name):
     """
-    :param deckName: string deck name
+    :param deck_name: string deck name
     :return data
     """
     data = {
         "action": "createDeck",
         "version": 6,
         "params": {
-            "deck": deckName
+            "deck": deck_name
         }
     }
-    return data    
-    
+    return data
 
-def anki_add_note(deckName, *tags, **fields):
+
+def anki_add_note(deck_name, *tags, **fields):
     """
-    :param deckName: string deck name
+    :param deck_name: string deck name
     :param tags: arg of strings
     :param fields: kwargs
     :return data kwargs
@@ -74,7 +78,7 @@ def anki_add_note(deckName, *tags, **fields):
         "version": 6,
         "params": {
             "note": {
-                "deckName": deckName,
+                "deckName": deck_name,
                 "modelName": settings.ANKI_MODEL,
                 "fields": fields,
                 "options": {
@@ -82,9 +86,10 @@ def anki_add_note(deckName, *tags, **fields):
                 },
                 "tags": tags
             }
-        }        
+        }
     }
     return data
+
 
 def anki(data):
     """
@@ -96,31 +101,34 @@ def anki(data):
             # if ONE_DECK_PER_NOTE is True, will create a deck per not
             # otherwise will put everything in one deck
             # but with tags gotten from the title of the note ;)
-            deckName = soup.h1.text if settings.ONE_DECK_PER_NOTE else settings.FOLDER
-            data = anki_create_deck(deckName=deckName)            
+            deck_name = soup.h1.text if settings.ONE_DECK_PER_NOTE else settings.FOLDER
+            data = anki_create_deck(deck_name=deck_name)
             data = json.dumps(data)
             tags = line['title'].split(' - ')[1:]
             res = requests.post(url=settings.ANKI_URL, data=data)
             if res.status_code == 200:
                 i = 0
                 headers = ()
-                for line in soup.table.thead.find_all('th'):
-                    if line.text in settings.ANKI_FIELDS:
-                        headers += (line.text,)
+                for line2 in soup.table.thead.find_all('th'):
+                    if line2.text in settings.ANKI_FIELDS:
+                        headers += (line2.text,)
                 if len(headers) == settings.ANKI_FIELD_COUNT:
                     lines = ()
                     i = 0
-                    for line in soup.table.tbody.find_all('td'):
+                    for line3 in soup.table.tbody.find_all('td'):
                         if i == settings.ANKI_FIELD_COUNT:
                             i = 0
                             fields = dict(zip(headers, lines))
-                            data = anki_add_note(deckName, *tags, **fields)
+                            print(fields)
+                            data = anki_add_note(deck_name, *tags, **fields)
                             data = json.dumps(data, indent=4)
-                            print(data)
                             res = requests.post(url=settings.ANKI_URL, data=data)
-                            lines = ()                    
+                            if res.status_code != 200:
+                                print(res.status_code)
+                            lines = ()
                         i += 1
-                        lines += (line.text, )
+                        lines += (line3.text, )
+
 
 if __name__ == '__main__':
     anki(data=data())

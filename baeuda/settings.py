@@ -1,6 +1,6 @@
 JOPLIN_WEBCLIPPER = 41184
 TOKEN = ''
-FOLDER = '🇰🇷  Kimchi!'
+FOLDER = 'Kimchi!'
 PYPANDOC_MARKDOWN = 'markdown_github'
 FILTER = ''
 ANKI_URL = 'http://localhost:8765/'
