@@ -107,24 +107,29 @@ def anki(data):
             tags = line['title'].split(' - ')[1:]
             res = requests.post(url=settings.ANKI_URL, data=data)
             if res.status_code == 200:
-                i = 0
-                headers = ()
-                for line2 in soup.table.thead.find_all('th'):
-                    if line2.text in settings.ANKI_FIELDS:
-                        headers += (line2.text,)
-                if len(headers) == settings.ANKI_FIELD_COUNT:
-                    lines = ()
+                tables = soup.find_all('table')
+                for table in tables:
+                    tds = table.find_all('td')
                     i = 0
-                    for line3 in soup.table.tbody.find_all('td'):
+                    headers = ()
+                    for line2 in soup.table.thead.find_all('th'):
+                        if line2.text in settings.ANKI_FIELDS:
+                            headers += (line2.text,)
+                    if len(headers) == settings.ANKI_FIELD_COUNT:
+                        lines = ()
+                        i = 0
+
+                    for line3 in tds:
                         if i == settings.ANKI_FIELD_COUNT:
                             i = 0
                             fields = dict(zip(headers, lines))
-                            print(fields)
+                            print(fields, tags)
                             data = anki_add_note(deck_name, *tags, **fields)
                             data = json.dumps(data, indent=4)
                             res = requests.post(url=settings.ANKI_URL, data=data)
                             if res.status_code != 200:
                                 print(res.status_code)
+                                
                             lines = ()
                         i += 1
                         lines += (line3.text, )
