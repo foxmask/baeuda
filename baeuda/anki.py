@@ -1,3 +1,4 @@
+import asyncio
 from bs4 import BeautifulSoup
 from joplin_api import JoplinApi
 import json
@@ -19,12 +20,12 @@ def subfolder(folder):
             return line['id']
 
 
-def myfolder():
+async def myfolder():
     """
 
     :return: the folder id
     """
-    res = joplin.get_folders()
+    res = await joplin.get_folders()
     for line in res.json():
         if settings.FOLDER == line['title']:
             return line['id']
@@ -34,14 +35,14 @@ def myfolder():
                 return folder_id
 
 
-def data():
+async def my_data():
     """
 
     :return: list of notes
     """
     data = []
-    folder_id = myfolder()
-    notes = joplin.get_folders_notes(folder_id)
+    folder_id = await myfolder()
+    notes = await joplin.get_folders_notes(folder_id)
     for note in notes.json():
         if settings.FILTER in note['title'] and note['is_todo'] == 0:
             content = pypandoc.convert_text(source=note['body'],
@@ -91,11 +92,13 @@ def anki_add_note(deck_name, *tags, **fields):
     return data
 
 
-def anki(data):
+async def anki():
     """
-    :param data: string converted in html
+
     """
+    data = await my_data()
     for line in data:
+        print(line['title'])
         soup = BeautifulSoup(line['body'], 'html.parser')
         if hasattr(soup.h1, 'text'):
             # if ONE_DECK_PER_NOTE is True, will create a deck per not
@@ -129,12 +132,13 @@ def anki(data):
                             res = requests.post(url=settings.ANKI_URL, data=data)
                             if res.status_code != 200:
                                 print(res.status_code)
-                                
+
                             lines = ()
                         i += 1
                         lines += (line3.text, )
 
 
 if __name__ == '__main__':
-    anki(data=data())
-
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(anki())
+    loop.close()
