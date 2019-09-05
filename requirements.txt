@@ -1,4 +1,4 @@
  joplin_api
  pypandoc
  requests
- bs4
+ beautifulsoup4
