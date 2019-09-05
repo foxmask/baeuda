@@ -1,0 +1,4 @@
+ joplin_api
+ pypandoc
+ requests
+ beautifulsoup4
