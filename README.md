@@ -1,6 +1,6 @@
 # 배우다 - Learn - Apprendre
 
-This script 'baeuda', allow to get the content of Joplin notes with tables and add that content to cards in deck(s)
+This script 'baeuda', allow to get the content of Joplin notes with tables and add that content to Anki cards in deck(s) 
 
 
 ## Joplin, format of notes
