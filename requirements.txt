@@ -1,0 +1,3 @@
+ joplin_api
+ pypandoc
+ requests
