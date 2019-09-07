@@ -3,18 +3,33 @@
 This script 'baeuda', allow to get the content of Joplin notes with tables and add that content to Anki cards in deck(s) 
 
 
-## Joplin, format of notes
+# system prerequisite
+
+pandoc is required on you system to allow to convert html content into markdown
+
+## Joplin, format of notes for Anki 
+
+One thing to keep in mind, to make all that stuff working all together: 
+
+You need to have the *same header name* in your joplin tables as in the "fields" of the "anki type of note"
+
+Let's see with an example :
+
+In anki, among the the provided types of notes, you can find "basic" which content 2 fields "recto" and "verso"
+
+so in joplin you will have to create tables with headers recto and verso 
 
 
 ```
-Title of the note - language A - Language B- language C
+Title of the note - Topic - details
 
-HeadingA | HeadingB | Heading C
--------- | -------- | ---------
-cel A | cel B | cel C
+Recto | Verso 
+-------- | --------
+Color on the sun ? | Yellow
+Universal reply ? | 42
 ```
 
-example 
+real example with three columns
 ```
 Kimchi! Fiche 1 - 인사 - insa - salutations
 Coréen | Romanisation | Français
@@ -23,12 +38,13 @@ Coréen | Romanisation | Français
 
 ```
 
-the script will split the title of the note at each ' - ' and drop the first piece, here 'Kimchi! Fiche 1', as we don't need the name of the chapter.
+the script will split the title of the note at each ' - ' (with space arround - ) and drop the first piece, here 'Kimchi! Fiche 1', as we don't need the name of the chapter.
 
 
 ## Anki desktop
 
-To add cards to Anki, you need to use an existing model. 
+To add cards to Anki, you need to use an existing model (also known as "type of notes") 
+
 There are many models you can use, if none fit your needs, you can create on as I did : 
 "tools > type of notes" then "add" button and choose "Duplicate Basic (and reversed card)" then we'll add a third fields "Romanication" and will change "Front" to "Coreen" and "Back" to "Français"
 
@@ -56,15 +72,16 @@ edit `settings.py`
 
 ```
 JOPLIN_WEBCLIPPER = 41184
-TOKEN = '' # provide the token of Joplin you can grab from the webclipper config page
-FOLDER = '🇰🇷  Kimchi!'
+TOKEN = ''    # provide the JOPLIN TOKEN you have on the webclipper configuration page
+FOLDER = 'Kimchi!'   # from which folder does baeuda read the notes to create into anki ?
 PYPANDOC_MARKDOWN = 'markdown_github'
-FILTER = ''  # if you need to reduce the list of note you want to add , set a string here
-ANKI_URL = 'http://localhost:8765/'
-ANKI_MODEL = 'Korean (foxmask)' # the name of the model you create in Anki desktop
-ANKI_FIELD_COUNT = 3   # number of columns to grab from a joplin notes table 
-ANKI_FIELDS = ['Coréen', 'Romanisation', 'Français']  # the name of the fields from the anki model 
-ONE_DECK_PER_NOTE = False # will create one deck, set to True if you want one Deck per note
+FILTER = ''
+ANKI_URL = 'http://localhost:8765/'   # url provided by AnkiConnect https://ankiweb.net/shared/info/2055492159
+ANKI_MODEL = 'Korean (foxmask)'  # the name of the model you create in Anki desktop, or the standard one you duplicate
+ANKI_FIELD_COUNT = 3   # number of columns to grab from a joplin table
+ANKI_FIELDS = ['Coréen', 'Romanisation', 'Français']  # put the name of the fields you want to use with the "ANKI_MODEL"
+ONE_DECK_PER_NOTE = False    # will create one deck, set to True if you want one Deck per note
+
 ```
 
 ## Let's Go 
@@ -73,9 +90,9 @@ just before running that command
 ```
 python baeuda/anki.py 
 ```
-Start Joplin and Anki on you desktop
+Start Joplin and Anki on your desktop
 
-during the running you can have a look in anki and see the deck created and receiving card ;)
+during the execution, you can have a look in anki and see the deck created and receiving cards ;)
 
 
 ## From Joplin to Anki in images
@@ -90,12 +107,12 @@ during the running you can have a look in anki and see the deck created and rece
 
 3) Anki with the new created decks
 
-![Anki Liste des Decks](/anki_list_decks.png)
+![Anki Decks List](/anki_list_decks.png)
 
 4) the cards of the deck
 
-![Anki Le Deck](/anki_deck.png)
+![Anki The Deck](/anki_deck.png)
 
 5) one card 
 
-![Anki Le Carte](/anki_card.png)
+![Anki The card](/anki_card.png)

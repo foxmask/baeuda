@@ -1,10 +1,10 @@
 JOPLIN_WEBCLIPPER = 41184
-TOKEN = ''
-FOLDER = 'Kimchi!'
+TOKEN = ''    # provide the JOPLIN TOKEN you have on the webclipper configuration page
+FOLDER = 'Kimchi!'   # from which folder does baeuda read the note to create into anki ?
 PYPANDOC_MARKDOWN = 'markdown_github'
 FILTER = ''
-ANKI_URL = 'http://localhost:8765/'
+ANKI_URL = 'http://localhost:8765/'   # url provided by AnkiConnect https://ankiweb.net/shared/info/2055492159
 ANKI_MODEL = 'Korean (foxmask)'  # fields are front/back/romanisation
 ANKI_FIELD_COUNT = 3   # number of columns to grab from a joplin table
-ANKI_FIELDS = ['Coréen', 'Romanisation', 'Français']
+ANKI_FIELDS = ['Coréen', 'Romanisation', 'Français']  # put the name of the fields you want to use with the "ANKI_MODEL"
 ONE_DECK_PER_NOTE = False    # will create one deck
