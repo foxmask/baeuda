@@ -3,9 +3,17 @@
 This script 'baeuda', allow to get the content of Joplin notes with tables and add that content to Anki cards in deck(s) 
 
 
-# system prerequisite
+## system prerequisite
 
 pandoc is required on you system to allow to convert html content into markdown
+
+## application prerequisites
+
+* python 3.6+
+* httpx
+* joplin_api
+* pypandoc
+* beautifulsoup4
 
 ## Joplin, format of notes for Anki 
 
@@ -46,9 +54,9 @@ the script will split the title of the note at each ' - ' (with space arround - 
 To add cards to Anki, you need to use an existing model (also known as "type of notes") 
 
 There are many models you can use, if none fit your needs, you can create on as I did : 
-"tools > type of notes" then "add" button and choose "Duplicate Basic (and reversed card)" then we'll add a third fields "Romanication" and will change "Front" to "Coreen" and "Back" to "Français"
+`tools > type of notes` then `add` button and choose `Duplicate Basic (and reversed card)` then we'll add a third fields `Romanisation` and will change `Front` to `Coreen` and `Back` to `Français`
 
-Then add this addon [AnkiConnect](https://foosoft.net/projects/anki-connect/index.html#installation) to allow Anki to provide a REST access that will allow us to add the note with the current script.
+Then add this addon [AnkiConnect](https://foosoft.net/projects/anki-connect/index.html#installation) to allow Anki to allow us to add the notes with the current script.
 
 
 ## Install the project
@@ -90,9 +98,9 @@ just before running that command
 ```
 python baeuda/anki.py 
 ```
-Start Joplin and Anki on your desktop
+Start Joplin (with the joplin desktop or joplin headless) and Anki on your desktop
 
-during the execution, you can have a look in anki and see the deck created and receiving cards ;)
+during the execution, you can have a look in anki and see the decks created and receiving cards ;)
 
 
 ## From Joplin to Anki in images
