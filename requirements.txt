@@ -1,4 +1,4 @@
- joplin_api
- pypandoc
- requests
- beautifulsoup4
+joplin_api
+pypandoc
+httpx
+beautifulsoup4
