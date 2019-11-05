@@ -19,7 +19,7 @@ pandoc is required on you system to allow to convert html content into markdown
 
 ### Joplin
 
-you can use Joplin as source of data, or a folder containing markdown files
+you can use [Joplin](https://joplinapp.org/) as source of data but launching the joplin desktop version or joplin server headless
 
 * If you use Joplin, the title of the notes should have to be that way:
 `foobar - xxx - yyy` 
