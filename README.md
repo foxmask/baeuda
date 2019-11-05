@@ -3,11 +3,11 @@
 This script 'baeuda', allow to get the content of Joplin notes with tables and add that content to Anki cards in deck(s) 
 
 
-## system prerequisite
+## System prerequisite
 
 pandoc is required on you system to allow to convert html content into markdown
 
-## application prerequisites
+## Application prerequisites
 
 * python 3.6+
 * httpx
@@ -15,7 +15,27 @@ pandoc is required on you system to allow to convert html content into markdown
 * pypandoc
 * beautifulsoup4
 
-## Joplin, format of notes for Anki 
+## DataSource
+
+### Joplin
+
+you can use Joplin as source of data, or a folder containing markdown files
+
+* If you use Joplin, the title of the notes should have to be that way:
+`foobar - xxx - yyy` 
+
+### Markdown files
+
+Baeuda will drop the first part before the - and will use xxx and yyy as tag in anki
+
+* If you use markdown file, the name of the file should have to be that way:
+
+`foobar - xxx - yyy.md`
+
+Baeuda will drop the first part before the - and will use xxx and yyy as tag in anki
+
+
+## Format of notes for Anki 
 
 One thing to keep in mind, to make all that stuff working all together: 
 

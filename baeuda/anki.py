@@ -1,55 +1,8 @@
 import asyncio
 from bs4 import BeautifulSoup
-from joplin_api import JoplinApi
 import json
-import pypandoc
 import settings
 import httpx
-
-joplin = JoplinApi(settings.TOKEN)
-
-
-def subfolder(folder):
-    """
-
-    :param folder: subfolder
-    :return: line of the founded children
-    """
-    for line in folder['children']:
-        if settings.FOLDER == line['title']:
-            return line['id']
-
-
-async def myfolder():
-    """
-
-    :return: the folder id
-    """
-    res = await joplin.get_folders()
-    for line in res.json():
-        if settings.FOLDER == line['title']:
-            return line['id']
-        if 'children' in line:
-            folder_id = subfolder(line)
-            if folder_id is not None:
-                return folder_id
-
-
-async def my_data():
-    """
-
-    :return: list of notes
-    """
-    data = []
-    folder_id = await myfolder()
-    notes = await joplin.get_folders_notes(folder_id)
-    for note in notes.json():
-        if settings.FILTER in note['title'] and note['is_todo'] == 0:
-            content = pypandoc.convert_text(source=note['body'],
-                                            to='html',
-                                            format=settings.PYPANDOC_MARKDOWN)
-            data.append({'title': note['title'], 'body': content})
-    return data
 
 
 def anki_create_deck(deck_name):
@@ -94,21 +47,24 @@ def anki_add_note(deck_name, *tags, **fields):
 
 async def anki():
     """
-
+    main loop
     """
     async with httpx.AsyncClient() as client:
-        data = await my_data()
-        for line in data:
-            print(line['title'])
+        # data = await my_data()
+        klass = getattr(__import__('datasource.' + settings.DATASOURCE.lower(),
+                                   fromlist=[settings.DATASOURCE]), settings.DATASOURCE)
+        all_data = await klass().data()
+        for line in all_data:
             soup = BeautifulSoup(line['body'], 'html.parser')
             if hasattr(soup.h1, 'text'):
                 # if ONE_DECK_PER_NOTE is True, will create a deck per not
                 # otherwise will put everything in one deck
                 # but with tags gotten from the title of the note ;)
-                deck_name = soup.h1.text if settings.ONE_DECK_PER_NOTE else settings.FOLDER
+                deck_name = soup.h1.text if settings.ONE_DECK_PER_NOTE else await klass().my_folder()
                 data = anki_create_deck(deck_name=deck_name)
                 data = json.dumps(data)
                 tags = line['title'].split(' - ')[1:]
+
                 res = await client.post(url=settings.ANKI_URL, data=data)
                 if res.status_code == 200:
                     tables = soup.find_all('table')

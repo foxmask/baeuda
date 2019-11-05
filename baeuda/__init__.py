@@ -6,4 +6,7 @@
 
 import baeuda.settings
 
+from baeuda.datasource.joplin import Joplin
+from baeuda.datasource.mdfile import MdFile
+
 __version__ = "0.3.0"
