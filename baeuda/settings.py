@@ -1,6 +1,7 @@
 JOPLIN_WEBCLIPPER = 41184
 TOKEN = ''    # provide the JOPLIN TOKEN you have on the webclipper configuration page
-FOLDER = 'Kimchi!'   # from which folder does baeuda read the note to create into anki ?
+FOLDER = 'Active Korean'   # from which folder does baeuda read the note to create into anki ?
+# FOLDER = 'Kimchi!'   # from which folder does baeuda read the note to create into anki ?
 # FOLDER = '/home/foxmask/tmp/'   # from which folder does baeuda read the note to create into anki ?
 PYPANDOC_MARKDOWN = 'markdown_github'
 FILTER = ''

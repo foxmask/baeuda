@@ -3,11 +3,12 @@
 This script 'baeuda', allow to get the content of Joplin notes with tables and add that content to Anki cards in deck(s) 
 
 
-## System prerequisite
+## :package: Installation
+
 
 pandoc is required on you system to allow to convert html content into markdown
 
-## Application prerequisites
+### Requirements 
 
 * python 3.6+
 * httpx
@@ -15,7 +16,7 @@ pandoc is required on you system to allow to convert html content into markdown
 * pypandoc
 * beautifulsoup4
 
-## DataSource
+## :dvd: Database
 
 ### Joplin
 
@@ -144,3 +145,6 @@ during the execution, you can have a look in anki and see the decks created and 
 5) one card 
 
 ![Anki The card](/anki_card.png)
+
+
+(Image credits to [Emojipedia](https://emojipedia.org/))
