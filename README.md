@@ -5,7 +5,6 @@ This script 'baeuda', allow to get the content of Joplin notes with tables and a
 
 ## :package: Installation
 
-
 pandoc is required on you system to allow to convert html content into markdown
 
 ### Requirements 
@@ -93,7 +92,7 @@ source bin/activate
 clone the project
 
 ```
-git clone https://github.com/foxmask/baeuda
+git clone https://gitlab.com/annyong/baeuda
 cd baeuda
 ```
 
