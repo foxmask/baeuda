@@ -1,4 +1,5 @@
-joplin_api
-pypandoc
-httpx
-beautifulsoup4
+joplin-api==1.6.0
+pypandoc==1.5
+httpx==0.16.1
+beautifulsoup4==4.9.3
+rich==9.1.0

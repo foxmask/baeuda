@@ -3,6 +3,13 @@ from bs4 import BeautifulSoup
 import json
 import settings
 import httpx
+from rich import console
+
+console = console.Console()
+
+
+def check_datasource():
+    return True if settings.DATASOURCE in ('Joplin', 'MdFile') else False
 
 
 def anki_create_deck(deck_name):
@@ -49,11 +56,15 @@ async def anki():
     """
     main loop
     """
-    async with httpx.AsyncClient() as client:
-        # data = await my_data()
-        klass = getattr(__import__('datasource.' + settings.DATASOURCE.lower(),
-                                   fromlist=[settings.DATASOURCE]), settings.DATASOURCE)
-        all_data = await klass().data()
+    if check_datasource() is False:
+        console.print('배우다 : the source of your notes is unknown, choose "MdFile" or "Joplin"', style="red")
+        exit(0)
+    klass = getattr(__import__('datasource.' + settings.DATASOURCE.lower(),
+                               fromlist=[settings.DATASOURCE]), settings.DATASOURCE)
+    all_data = await klass().data()
+
+    with httpx.Client() as client:
+        lines = ()
         for line in all_data:
             soup = BeautifulSoup(line['body'], 'html.parser')
             if hasattr(soup.h1, 'text'):
@@ -65,11 +76,11 @@ async def anki():
                 data = json.dumps(data)
                 tags = line['title'].split(' - ')[1:]
 
-                res = await client.post(url=settings.ANKI_URL, data=data)
+                res = client.post(url=settings.ANKI_URL, data=data)
                 if res.status_code == 200:
                     tables = soup.find_all('table')
                     for table in tables:
-                        tds = table.find_all('td')
+                        table_lines = table.find_all('td')
                         i = 0
                         headers = ()
                         for line2 in soup.table.thead.find_all('th'):
@@ -79,24 +90,22 @@ async def anki():
                             lines = ()
                             i = 0
 
-                        for line3 in tds:
+                        for line3 in table_lines:
                             if i == settings.ANKI_FIELD_COUNT:
                                 i = 0
                                 fields = dict(zip(headers, lines))
-                                print(fields, tags)
+                                console.print(f"{fields} {tags}", style="blue")
                                 data = anki_add_note(deck_name, *tags, **fields)
                                 data = json.dumps(data, indent=4)
-                                res = await client.post(url=settings.ANKI_URL, data=data)
+                                res = client.post(url=settings.ANKI_URL, data=data)
                                 if res.status_code != 200:
-                                    print(res.status_code)
+                                    console.print(res.status_code, style="red")
 
                                 lines = ()
                             i += 1
                             lines += (line3.text, )
 
 if __name__ == '__main__':
-    print('배우다 : starting')
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(anki())
-    loop.close()
-    print('배우다 : finished')
+    console.print('배우다 : starting', style="green")
+    asyncio.run(anki())
+    console.print('배우다 : finished', style="green")
