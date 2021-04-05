@@ -2,19 +2,12 @@ from pathlib import Path
 import os
 import pypandoc
 import settings
+from rich import console
+
+console = console.Console()
 
 
 class MdFile:
-
-    def __init__(self):
-        pass
-
-    async def my_folder(self):
-        """
-
-        :return: return the folder name used by he filesystem where md files are
-        """
-        return os.path.basename(os.path.normpath(settings.FOLDER))
 
     async def data(self):
         """

@@ -1,5 +1,8 @@
+# coding: utf-8
+import argparse
 import asyncio
 from bs4 import BeautifulSoup
+from datasource.mdfile import MdFile
 import json
 import settings
 import httpx
@@ -9,7 +12,7 @@ console = console.Console()
 
 
 def check_datasource():
-    return True if settings.DATASOURCE in ('Joplin', 'MdFile') else False
+    return True if settings.DATASOURCE in ('MdFile', ) else False
 
 
 def anki_create_deck(deck_name):
@@ -52,29 +55,19 @@ def anki_add_note(deck_name, *tags, **fields):
     return data
 
 
-async def anki():
+async def go():
     """
     main loop
     """
-    if check_datasource() is False:
-        console.print('배우다 : the source of your notes is unknown, choose "MdFile" or "Joplin"', style="red")
-        exit(0)
-    klass = getattr(__import__('datasource.' + settings.DATASOURCE.lower(),
-                               fromlist=[settings.DATASOURCE]), settings.DATASOURCE)
-    all_data = await klass().data()
-
+    all_data = await MdFile().data()
     with httpx.Client() as client:
         lines = ()
         for line in all_data:
             soup = BeautifulSoup(line['body'], 'html.parser')
             if hasattr(soup.h1, 'text'):
-                # if ONE_DECK_PER_NOTE is True, will create a deck per not
-                # otherwise will put everything in one deck
-                # but with tags gotten from the title of the note ;)
-                deck_name = soup.h1.text if settings.ONE_DECK_PER_NOTE else await klass().my_folder()
-                data = anki_create_deck(deck_name=deck_name)
+                tags = soup.h2 if "tags:" in soup.h2 else ""
+                data = anki_create_deck(deck_name=settings.ANKI_DECK)
                 data = json.dumps(data)
-                tags = line['title'].split(' - ')[1:]
 
                 res = client.post(url=settings.ANKI_URL, data=data)
                 if res.status_code == 200:
@@ -95,7 +88,7 @@ async def anki():
                                 i = 0
                                 fields = dict(zip(headers, lines))
                                 console.print(f"{fields} {tags}", style="blue")
-                                data = anki_add_note(deck_name, *tags, **fields)
+                                data = anki_add_note(settings.ANKI_DECK, *tags, **fields)
                                 data = json.dumps(data, indent=4)
                                 res = client.post(url=settings.ANKI_URL, data=data)
                                 if res.status_code != 200:
@@ -105,7 +98,70 @@ async def anki():
                             i += 1
                             lines += (line3.text, )
 
+
+async def report():
+    """
+    main loop
+    """
+    all_data = await MdFile().data()
+
+    lines = ()
+    for line in all_data:
+        soup = BeautifulSoup(line['body'], 'html.parser')
+        if hasattr(soup.h1, 'text'):
+            title = soup.h1.text
+            console.print(title, style="cyan")
+            tags = ''
+            tags = soup.h2.text if "tags:" in soup.h2.text else ""
+
+            tables = soup.find_all('table')
+            for table in tables:
+                table_lines = table.find_all('td')
+                i = 0
+                headers = ()
+
+                for line2 in soup.table.thead.find_all('th'):
+                    if line2.text in settings.ANKI_FIELDS:
+                        # console.print(line2.text, style="yellow")
+                        headers += (line2.text,)
+
+                if len(headers) == settings.ANKI_FIELD_COUNT:
+                    # console.print(headers, style="magenta")
+                    lines = ()
+                    i = 0
+
+                for line3 in table_lines:
+                    if i == settings.ANKI_FIELD_COUNT:
+                        i = 0
+                        fields = dict(zip(headers, lines))
+                        if fields:
+                            console.print(f"{fields} {tags}", style="yellow")
+                        lines = ()
+                    i += 1
+                    lines += (line3.text, )
+
+
 if __name__ == '__main__':
-    console.print('배우다 : starting', style="green")
-    asyncio.run(anki())
+    console.print('배우다 : Start processing ', style="green")
+
+    if check_datasource() is False:
+        console.print('배우다 : the source of your notes is unknown, set DATASOURCE="MdFile" in the settings.py file',
+                      style="red")
+        exit(0)
+
+    parser = argparse.ArgumentParser(prog="python run.py", description='배우다 - baeuda')
+    parser.add_argument('-a',
+                        action='store',
+                        choices=['report', 'go'],
+                        required=True,
+                        help="choose -a report or -a go")
+    args = parser.parse_args()
+    if 'a' not in args:
+        parser.print_help()
+    elif args.a == 'go':
+        asyncio.run(go())
+    elif args.a == 'report':
+        console.print('[cyan]Report[/]')
+        asyncio.run(report())
+
     console.print('배우다 : finished', style="green")
