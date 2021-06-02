@@ -106,7 +106,7 @@ ONE_DECK_PER_NOTE = False    # will create one deck, set to True if you want one
 
 just before running that command
 ```
-python baeuda/anki.py 
+python baeuda/run.py -a go
 ```
 Start Anki on your desktop
 
