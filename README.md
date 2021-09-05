@@ -1,4 +1,4 @@
-# 배우다 - Learn - Apprendre
+# 배우다 - Beauda - Learn - Apprendre
 
 This script 'baeuda', allow to get the content of markdown file tables and add that content to Anki cards in deck(s) 
 
@@ -14,30 +14,81 @@ pandoc is required on you system to allow to convert html content into markdown
 * pypandoc
 * beautifulsoup4
 
-## :dvd: Database
+### Install the project
+
+create a virtualenv
+
+```bash
+python3.6 -m venv baeuda
+cd baeuda
+source bin/activate
+```
+
+clone the project
+
+```bash
+git clone https://framagit.org/foxmask/baeuda
+cd baeuda
+```
+or 
+```bash
+pip install baeuda
+```
+
+### Settings
+
+edit `settings.py`
+
+```
+FOLDER = '/home/foxmask/MyNotes/Kimchi!'   # from which folder does baeuda read the notes to create into anki ?
+PYPANDOC_MARKDOWN = 'markdown_github'
+FILTER = ''
+ANKI_URL = 'http://localhost:8765/'   # url provided by AnkiConnect https://ankiweb.net/shared/info/2055492159
+ANKI_MODEL = 'Korean (foxmask)'  # the name of the model you create in Anki desktop, or the standard one you duplicate
+ANKI_FIELD_COUNT = 3   # number of columns to grab from a markdown table
+ANKI_FIELDS = ['Coréen', 'Romanisation', 'Français']  # put the name of the fields you want to use with the "ANKI_MODEL"
+ANKI_DECK = 'Korean Courses'
+```
+
+
+
+## :dvd: DataSource
 
 ### Markdown files
 
-Baeuda will drop the first part before the - and will use xxx and yyy as tag in anki
-
-* If you use markdown file, the name of the file should have to be that way:
+The name of the file should have to be that way:
 
 `foobar - xxx - yyy.md`
 
-Baeuda will drop the first part before the - and will use xxx and yyy as tag in anki
+for example 
+
+`Kimchi! 01 - insa - 인사.md`
+
+Baeuda will create note with xxx and yyy as tag in anki. 
+In our example : `insa` and `인사` 
+
+### Possibles DataSources
+
+#### joplin
+
+you can create datasource class that will get the expected data from where you want.
+previously the project also get Joplin notes as datasource. 
+So you could create notes in joplin, and with baeuda, create anki card with them. 
 
 
 ## Format of notes for Anki 
 
-One thing to keep in mind, to make all that stuff working all together: 
+To process, all the markdown files should have, at least, those content structure:
 
-You need to have the *same header name* in your markdown tables as in the "fields" of the "anki type of note"
+* h1 with the title of your markdown file
+* h2 with tags name (optional) 
+* table with same headers name of the "fields" defined in the "anki type of note"
 
 Let's see with an example :
 
-In anki, among the the provided types of notes, you can find "basic" which content 2 fields "recto" and "verso"
+In anki, among the provided types of notes, you can find "basic" which content 2 fields "recto" and "verso"
 
-so in your makrdown file you will have to create tables with headers recto and verso 
+so in your markdown file you will have to create tables with headers named *recto* and *verso* 
 
 
 ```
@@ -58,8 +109,6 @@ Coréen | Romanisation | Français
 
 ```
 
-the script will split the title of the note at each ' - ' (with space arround - ) and drop the first piece, here 'Kimchi! Fiche 1', as we don't need the name of the chapter.
-
 
 ## Anki desktop
 
@@ -71,44 +120,24 @@ There are many models you can use, if none fit your needs, you can create on as 
 Then add this addon [AnkiConnect](https://foosoft.net/projects/anki-connect/index.html#installation) to allow Anki to allow us to add the notes with the current script.
 
 
-## Install the project
-
-create a virtualenv
-
-```
-python3.6 -m venv baeuda
-cd baeuda
-source bin/activate
-```
-
-clone the project
-
-```
-git clone https://gitlab.com/annyong/baeuda
-cd baeuda
-```
-
-edit `settings.py`
-
-```
-FOLDER = '/home/foxmask/MyNotes/Kimchi!'   # from which folder does baeuda read the notes to create into anki ?
-PYPANDOC_MARKDOWN = 'markdown_github'
-FILTER = ''
-ANKI_URL = 'http://localhost:8765/'   # url provided by AnkiConnect https://ankiweb.net/shared/info/2055492159
-ANKI_MODEL = 'Korean (foxmask)'  # the name of the model you create in Anki desktop, or the standard one you duplicate
-ANKI_FIELD_COUNT = 3   # number of columns to grab from a markdown table
-ANKI_FIELDS = ['Coréen', 'Romanisation', 'Français']  # put the name of the fields you want to use with the "ANKI_MODEL"
-ONE_DECK_PER_NOTE = False    # will create one deck, set to True if you want one Deck per note
-
-```
 
 ## Let's Go 
 
-just before running that command
+First of all, start Anki on your desktop
+
+### simulated process
+
+```bash
+python baeuda/run.py -a report
 ```
+will display a table of all the grabbed data to create card
+
+
+### creating cards
+
+```bash
 python baeuda/run.py -a go
 ```
-Start Anki on your desktop
 
 during the execution, you can have a look in anki and see the decks created and receiving cards ;)
 

@@ -7,7 +7,6 @@ def test_settings():
 
     FOLDER = settings.FOLDER
     PYPANDOC_MARKDOWN = settings.PYPANDOC_MARKDOWN
-    FILTER = settings.FILTER
     ANKI_URL = settings.ANKI_URL
     ANKI_MODEL = settings.ANKI_MODEL
     ANKI_DECK = settings.ANKI_DECK
@@ -17,7 +16,6 @@ def test_settings():
 
     assert type(FOLDER) is str
     assert type(PYPANDOC_MARKDOWN) is str
-    assert type(FILTER) is str
     assert type(ANKI_URL) is str
     assert type(ANKI_MODEL) is str
     assert type(ANKI_DECK) is str

@@ -77,6 +77,7 @@ async def go():
                         i = 0
                         headers = ()
                         for line2 in soup.table.thead.find_all('th'):
+                            # check the header is as expected in the settings
                             if line2.text in settings.ANKI_FIELDS:
                                 headers += (line2.text,)
                         if len(headers) == settings.ANKI_FIELD_COUNT:
@@ -88,8 +89,10 @@ async def go():
                                 i = 0
                                 fields = dict(zip(headers, lines))
                                 console.print(f"{fields} {tags}", style="blue")
+                                # add note to card
                                 data = anki_add_note(settings.ANKI_DECK, *tags, **fields)
                                 data = json.dumps(data, indent=4)
+                                # submit the card to Anki
                                 res = client.post(url=settings.ANKI_URL, data=data)
                                 if res.status_code != 200:
                                     console.print(res.status_code, style="red")
@@ -122,11 +125,9 @@ async def report():
 
                 for line2 in soup.table.thead.find_all('th'):
                     if line2.text in settings.ANKI_FIELDS:
-                        # console.print(line2.text, style="yellow")
                         headers += (line2.text,)
 
                 if len(headers) == settings.ANKI_FIELD_COUNT:
-                    # console.print(headers, style="magenta")
                     lines = ()
                     i = 0
 
@@ -154,7 +155,8 @@ if __name__ == '__main__':
                         action='store',
                         choices=['report', 'go'],
                         required=True,
-                        help="choose -a report or -a go")
+                        help="Choose -a report to display the content of the data that will add cards "
+                             "or -a go to create the cards")
     args = parser.parse_args()
     if 'a' not in args:
         parser.print_help()
