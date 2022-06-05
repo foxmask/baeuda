@@ -65,7 +65,9 @@ async def go():
         for line in all_data:
             soup = BeautifulSoup(line['body'], 'html.parser')
             if hasattr(soup.h1, 'text'):
-                tags = soup.h2 if "tags:" in soup.h2 else ""
+                tags = ''
+                if soup.has_attr('h2'):
+                    tags = soup.h2 if "tags:" in soup.h2 else ""
                 data = anki_create_deck(deck_name=settings.ANKI_DECK)
                 data = json.dumps(data)
 
@@ -100,6 +102,8 @@ async def go():
                                 lines = ()
                             i += 1
                             lines += (line3.text, )
+                elif res.status_code == 404:
+                    print("service not started")
 
 
 async def report():

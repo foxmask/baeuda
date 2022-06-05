@@ -9,7 +9,7 @@ pandoc is required on you system to allow to convert html content into markdown
 
 ### Requirements 
 
-* python 3.6+
+* python 3.8+
 * httpx
 * pypandoc
 * beautifulsoup4
@@ -19,7 +19,7 @@ pandoc is required on you system to allow to convert html content into markdown
 create a virtualenv
 
 ```bash
-python3.6 -m venv baeuda
+python3.8 -m venv baeuda
 cd baeuda
 source bin/activate
 ```
@@ -66,15 +66,6 @@ for example
 
 Baeuda will create note with xxx and yyy as tag in anki. 
 In our example : `insa` and `인사` 
-
-### Possibles DataSources
-
-#### joplin
-
-you can create datasource class that will get the expected data from where you want.
-previously the project also get Joplin notes as datasource. 
-So you could create notes in joplin, and with baeuda, create anki card with them. 
-
 
 ## Format of notes for Anki 
 
