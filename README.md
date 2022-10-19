@@ -27,7 +27,7 @@ source bin/activate
 clone the project
 
 ```bash
-git clone https://framagit.org/foxmask/baeuda
+git clone https://git.afpy.org/foxmask/baeuda
 cd baeuda
 ```
 or 

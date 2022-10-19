@@ -1,6 +1,7 @@
 # coding: utf-8
 import argparse
 import asyncio
+import os.path
 from bs4 import BeautifulSoup
 from datasource.mdfile import MdFile
 import json
@@ -55,20 +56,22 @@ def anki_add_note(deck_name, *tags, **fields):
     return data
 
 
-async def go():
+async def go(my_file=''):
     """
     main loop
     """
-    all_data = await MdFile().data()
+    all_data = await MdFile().data(my_file)
     with httpx.Client() as client:
         lines = ()
         for line in all_data:
             soup = BeautifulSoup(line['body'], 'html.parser')
             if hasattr(soup.h1, 'text'):
+                anki_deck_name = soup.h1.text
+                console.print(anki_deck_name, style="cyan")
                 tags = ''
-                if soup.has_attr('h2'):
-                    tags = soup.h2 if "tags:" in soup.h2 else ""
-                data = anki_create_deck(deck_name=settings.ANKI_DECK)
+                tags = soup.h2.text if "tags:" in soup.h2.text else ""
+
+                data = anki_create_deck(deck_name=anki_deck_name)
                 data = json.dumps(data)
 
                 res = client.post(url=settings.ANKI_URL, data=data)
@@ -87,12 +90,14 @@ async def go():
                             i = 0
 
                         for line3 in table_lines:
+                            i += 1
+                            lines += (line3.text, )
                             if i == settings.ANKI_FIELD_COUNT:
                                 i = 0
                                 fields = dict(zip(headers, lines))
                                 console.print(f"{fields} {tags}", style="blue")
                                 # add note to card
-                                data = anki_add_note(settings.ANKI_DECK, *tags, **fields)
+                                data = anki_add_note(anki_deck_name, *tags, **fields)
                                 data = json.dumps(data, indent=4)
                                 # submit the card to Anki
                                 res = client.post(url=settings.ANKI_URL, data=data)
@@ -100,34 +105,30 @@ async def go():
                                     console.print(res.status_code, style="red")
 
                                 lines = ()
-                            i += 1
-                            lines += (line3.text, )
+
                 elif res.status_code == 404:
                     print("service not started")
 
 
-async def report():
+async def report(my_file=''):
     """
     main loop
     """
-    all_data = await MdFile().data()
-
+    all_data = await MdFile().data(my_file)
     lines = ()
     for line in all_data:
         soup = BeautifulSoup(line['body'], 'html.parser')
         if hasattr(soup.h1, 'text'):
-            title = soup.h1.text
-            console.print(title, style="cyan")
-            tags = ''
+            anki_deck_name = soup.h1.text
+            console.print(anki_deck_name, style="cyan")
             tags = soup.h2.text if "tags:" in soup.h2.text else ""
-
             tables = soup.find_all('table')
             for table in tables:
                 table_lines = table.find_all('td')
                 i = 0
                 headers = ()
 
-                for line2 in soup.table.thead.find_all('th'):
+                for line2 in table.thead.find_all('th'):
                     if line2.text in settings.ANKI_FIELDS:
                         headers += (line2.text,)
 
@@ -136,14 +137,14 @@ async def report():
                     i = 0
 
                 for line3 in table_lines:
+                    i += 1
+                    lines += (line3.text, )
                     if i == settings.ANKI_FIELD_COUNT:
                         i = 0
                         fields = dict(zip(headers, lines))
                         if fields:
                             console.print(f"{fields} {tags}", style="yellow")
                         lines = ()
-                    i += 1
-                    lines += (line3.text, )
 
 
 if __name__ == '__main__':
@@ -161,13 +162,28 @@ if __name__ == '__main__':
                         required=True,
                         help="Choose -a report to display the content of the data that will add cards "
                              "or -a go to create the cards")
+    parser.add_argument('-o', '--file', nargs='?')
     args = parser.parse_args()
     if 'a' not in args:
         parser.print_help()
     elif args.a == 'go':
-        asyncio.run(go())
+        if args.file:
+            if os.path.exists(args.file):
+                my_file = args.file
+                asyncio.run(go(my_file=my_file))
+            else:
+                console.print("file does not exist", style="red")
+        else:
+            asyncio.run(go())
     elif args.a == 'report':
         console.print('[cyan]Report[/]')
-        asyncio.run(report())
+        if args.file:
+            if os.path.exists(args.file):
+                my_file = args.file
+                asyncio.run(report(my_file=my_file))
+            else:
+                console.print("file does not exist", style="red")
+        else:
+            asyncio.run(report())
 
     console.print('배우다 : finished', style="green")
