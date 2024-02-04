@@ -31,6 +31,17 @@ def anki_create_deck(deck_name):
     return data
 
 
+def anki_remove_deck(deck_name):
+    data = {
+        "action": "deleteDecks",
+        "version": 6,
+        "params": {
+            "deck": deck_name
+        }
+    }
+    return data
+
+
 def anki_add_note(deck_name, *tags, **fields):
     """
     :param deck_name: string deck name
@@ -66,10 +77,11 @@ async def go(my_file=''):
         for line in all_data:
             soup = BeautifulSoup(line['body'], 'html.parser')
             if hasattr(soup.h1, 'text'):
-                anki_deck_name = soup.h1.text
+                anki_deck_name = soup.h1.text.strip()
                 console.print(anki_deck_name, style="cyan")
                 tags = ''
-                tags = soup.h2.text if "tags:" in soup.h2.text else ""
+                if hasattr(soup.h2, 'text'):
+                    tags = soup.h2.text if "tags:" in soup.h2.text else ""
 
                 data = anki_create_deck(deck_name=anki_deck_name)
                 data = json.dumps(data)
@@ -95,19 +107,27 @@ async def go(my_file=''):
                             if i == settings.ANKI_FIELD_COUNT:
                                 i = 0
                                 fields = dict(zip(headers, lines))
-                                console.print(f"{fields} {tags}", style="blue")
-                                # add note to card
-                                data = anki_add_note(anki_deck_name, *tags, **fields)
-                                data = json.dumps(data, indent=4)
-                                # submit the card to Anki
-                                res = client.post(url=settings.ANKI_URL, data=data)
-                                if res.status_code != 200:
-                                    console.print(res.status_code, style="red")
-
+                                if fields:
+                                    console.print(f"{fields} {tags}", style="blue")
+                                    # add note to card
+                                    data = anki_add_note(anki_deck_name, *tags, **fields)
+                                    data = json.dumps(data, indent=4)
+                                    # submit the card to Anki
+                                    res = client.post(url=settings.ANKI_URL, data=data)
+                                    if res.status_code != 200:
+                                        console.print(res.status_code, style="red")
+                                    else:
+                                        result = res.json()
+                                        if result['result'] is None and 'error' in result:
+                                            console.print(res.json(), style="red")
                                 lines = ()
 
+                    if len(tables) == 0:
+                        # drop empty deck created for nothing
+                        anki_remove_deck(anki_deck_name)
+
                 elif res.status_code == 404:
-                    print("service not started")
+                    print("AnkiConnect service not started")
 
 
 async def report(my_file=''):
@@ -119,7 +139,7 @@ async def report(my_file=''):
     for line in all_data:
         soup = BeautifulSoup(line['body'], 'html.parser')
         if hasattr(soup.h1, 'text'):
-            anki_deck_name = soup.h1.text
+            anki_deck_name = soup.h1.text.strip()
             console.print(anki_deck_name, style="cyan")
             tags = soup.h2.text if "tags:" in soup.h2.text else ""
             tables = soup.find_all('table')

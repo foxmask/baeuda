@@ -1,4 +1,4 @@
-pypandoc==1.9
+pypandoc
 httpx>=0.23.0
-beautifulsoup4==4.11.1
-rich==12.6.0
+beautifulsoup4
+rich

@@ -25,7 +25,7 @@ class MdFile:
         if my_file:
             data.append({'body': await self.get_data(my_file)})
         else:
-            p = Path(settings.FOLDER).glob('**/*.md')
+            p = Path(settings.FOLDER).glob('*.md')
             for full_file in p:
                 data.append({'body': await self.get_data(full_file)})
 
