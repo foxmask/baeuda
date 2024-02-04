@@ -137,19 +137,19 @@ during the execution, you can have a look in anki and see the decks created and 
 
 2) baeuda running in the console 
 
-![Anki integration](/anki_integration.png)
+![Anki integration](anki_integration.png)
 
 3) Anki with the new created decks
 
-![Anki Decks List](/anki_list_decks.png)
+![Anki Decks List](anki_list_decks.png)
 
 4) the cards of the deck
 
-![Anki The Deck](/anki_deck.png)
+![Anki The Deck](anki_deck.png)
 
 5) one card 
 
-![Anki The card](/anki_card.png)
+![Anki The card](anki_card.png)
 
 
 (Image credits to [Emojipedia](https://emojipedia.org/))
