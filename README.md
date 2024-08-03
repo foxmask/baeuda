@@ -1,6 +1,6 @@
 # 배우다 - Beauda - Learn - Apprendre
 
-Create Anki deck and Card from you markdown file
+Create Anki deck and Card from your markdown files
 
 
 ## :package: Installation
@@ -30,7 +30,9 @@ clone the project
 git clone https://github.com/foxmask/baeuda.git
 cd baeuda
 ```
+
 or
+
 ```bash
 pip install baeuda
 ```
@@ -39,7 +41,7 @@ pip install baeuda
 
 edit `settings.py`
 
-```
+```ini
 # from which folder does baeuda read the note to create into anki ?
 # FOLDER = '/home/foxmask/MesNotes/Corée🇰🇷/공부/Kimchi!/'
 # FOLDER = '/home/foxmask/MesNotes/Corée🇰🇷/공부/Cours - Active Korean 1 - 2020-2021'
@@ -110,6 +112,7 @@ Universal reply ? | 42
 ```
 
 real example with three columns
+
 ```
 Kimchi! Fiche 1 - 인사 - insa - salutations
 Coréen | Romanisation | Français
@@ -139,6 +142,7 @@ First of all, start Anki on your desktop
 ```bash
 python baeuda/run.py -a report
 ```
+
 will display a table of all the grabbed data to create card
 
 
@@ -155,19 +159,19 @@ during the execution, you can have a look in anki and see the decks created and 
 
 2) baeuda running in the console
 
-![Anki integration](anki_integration.png)
+![Anki integration](https://raw.githubusercontent.com/foxmask/baeuda/master/anki_integration.png)
 
 3) Anki with the new created decks
 
-![Anki Decks List](anki_list_decks.png)
+![Anki Decks List](https://raw.githubusercontent.com/foxmask/baeuda/master/anki_list_decks.png)
 
 4) the cards of the deck
 
-![Anki The Deck](anki_deck.png)
+![Anki The Deck](https://raw.githubusercontent.com/foxmask/baeuda/master/anki_deck.png)
 
 5) one card
 
-![Anki The card](anki_card.png)
+![Anki The card](https://raw.githubusercontent.com/foxmask/baeuda/master/anki_card.png)
 
 
 (Image credits to [Emojipedia](https://emojipedia.org/))
